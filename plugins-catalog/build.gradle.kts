@@ -14,6 +14,8 @@ plugins {
     embeddedKotlin("jvm")
 
     `kotlin-dsl`
+
+    id("com.gradle.plugin-publish") version "1.2.1"
 }
 
 repositories {
@@ -49,12 +51,17 @@ testing {
     }
 }
 
+group = "elect86.plugins-catalog"
+version = "0.0.01"
+
 gradlePlugin {
     // Define the plugin
     val greeting by plugins.creating {
         id = "elect86.plugins-catalog"
         displayName = "`plugins` block accessors in precompiled scripts"
+        website = "https://github.com/elect86/buildSrc-catalog"
         description = "use your catalog plugins in the `plugins` block of your precompiled scripts"
+        vcsUrl = "https://github.com/elect86/buildSrc-catalog.git"
         tags = listOf("catalog", "plugins", "block", "precompiled", "scripts")
         implementationClass = "org.example.PluginsCatalogPlugin"
     }

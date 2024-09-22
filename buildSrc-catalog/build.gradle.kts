@@ -14,6 +14,8 @@ plugins {
     embeddedKotlin("jvm")
 
     `kotlin-dsl`
+
+    id("com.gradle.plugin-publish") version "1.2.1"
 }
 
 repositories {
@@ -49,12 +51,17 @@ testing {
     }
 }
 
+group = "elect86.buildSrc-catalog"
+version = "0.0.01"
+
 gradlePlugin {
     // Define the plugin
     val greeting by plugins.creating {
         id = "elect86.buildSrc-catalog"
         displayName = "auto-generation of catalog accessor for your buildSrc scripts"
+        website = "https://github.com/elect86/buildSrc-catalog"
         description = "it generates automatically a catalog-like for the buildSrc scripts"
+        vcsUrl = "https://github.com/elect86/buildSrc-catalog.git"
         tags = listOf("catalog", "auto", "generation", "buildSrc", "scripts")
         implementationClass = "org.example.BuildSrcCatalogPlugin"
     }
