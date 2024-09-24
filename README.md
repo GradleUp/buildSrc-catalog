@@ -1,6 +1,6 @@
 # buildSrc-catalog
 
-There project aim to alleviate the long standing issue about having version catalogs accessible from precompiled script plugins
+There project aim to alleviate the long standing [issue](https://github.com/gradle/gradle/issues/15383) about having version catalogs accessible from precompiled script plugins
 
 This is actually based on two plugins, a setting one and a project one
 
