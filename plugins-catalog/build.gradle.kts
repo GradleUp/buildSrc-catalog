@@ -19,8 +19,19 @@ plugins {
 }
 
 repositories {
-    // Use Maven Central for resolving dependencies.
     mavenCentral()
+    // Use Maven Central for resolving dependencies.
+//    maven {
+//        url = uri("https://repo.gradle.org/ui/native/libs-releases-local/")
+//    }
+    maven("https://repo.gradle.org/gradle/libs-releases-local")
+//    maven("https://repo.gradle.org/ui/native/libs-releases-local")
+//    maven("https://repo.gradle.org/ui/native/libs")
+}
+
+dependencies {
+    implementation("org.gradle:gradle-kotlin-dsl-provider-plugins:6.1.1")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:$embeddedKotlinVersion")
 }
 
 testing {

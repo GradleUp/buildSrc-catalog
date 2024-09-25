@@ -5,9 +5,10 @@ package org.example
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.internal.configuration.problems.projectPathFrom
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.invoke
+import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.provider.plugins.precompiled.tasks.ExtractPrecompiledScriptPluginPlugins
 
 /**
  * A simple 'hello world' plugin.
@@ -16,26 +17,113 @@ class PluginsCatalogPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
 
-//        println("apply $target")
+        println("apply $target")
+
+        if (target.name != "buildSrc") {
+            target.tasks.register("create-buildSrc") {
+                doLast {
+                    val dir = target.layout.projectDirectory.dir("buildSrc").asFile
+                    dir.resolve("src/main/kotlin/myPlugin.gradle.kts").apply {
+                        parentFile.mkdirs()
+                        createNewFile()
+                        writeText(
+                            """
+                            plugins {
+                                
+                            }
+                        """.trimIndent()
+                        )
+                    }
+                    dir.resolve("build.gradle.kts").apply {
+                        createNewFile()
+                        writeText(
+                            """
+                            plugins {
+                                `kotlin-dsl`
+                                id("elect86.buildSrc-catalog")
+                            }
+                            
+                            repositories { 
+                                mavenCentral()
+                            }
+                        """.trimIndent()
+                        )
+                    }
+                    dir.resolve("settings.gradle.kts").apply {
+                        createNewFile()
+                        writeText(
+                            """
+                            rootProject.name = "buildSrc"
+                            
+                            plugins {
+                                id("elect86.plugins-catalog")
+                            }
+                        """.trimIndent()
+                        )
+                    }
+                }
+            }
+            return
+        } else {
+            target.tasks.named<ExtractPrecompiledScriptPluginPlugins>("extractPrecompiledScriptPluginPlugins") {
+//                println(this.outputDir.asFile.get().absolutePath)
+//                println(this::class.members.filter { it.name == "plugins" }.first().call(this))
+//                println(this::class.members.filter { it.name == "scriptFiles" }.first().call(this))
+//                println(plugins as PrecompiledScriptPlugin)
+            }
+
+            target.tasks.named("compilePluginsBlocks") {
+                doFirst {
+                    val dir = target.layout.buildDirectory.dir("kotlin-dsl/plugins-blocks/extracted").get().asFile
+                    val plugins: Map<String, String> = target.file("build/catalog/plugins").readText()
+                        .split(',').associate {
+                            val (acc, id) = it.split('=')
+                            val accessor = if ('-' in acc) "`$acc`" else acc
+                            "    $accessor" to id
+                        }
+                    for (pluginsBlock in dir.listFiles()) {
+                        val lines = pluginsBlock.readLines()
+                        println("original:\n" + pluginsBlock.readText())
+                        val resolved = buildString {
+                            for (line in lines) {
+//                                println(line)
+                                plugins[line]?.let {
+//                                    println("found $it")
+                                    appendLine("    id (\"$it\")")
+                                } ?: appendLine(line)
+                            }
+                        }
+                        println("resolved:\n$resolved")
+                        pluginsBlock.writeText(resolved)
+                    }
+                }
+            }
+        }
+
+        if (!target.file("build/catalog/plugins").exists())
+            return
 
         val scripts = target.layout.projectDirectory.dir("src/main/kotlin").asFile
-                .listFiles { _, name -> name.endsWith(".gradle.kts") }
+            .listFiles { _, name -> name.endsWith(".gradle.kts") }
 
         val toDelete = target.extra.properties.keys.filter { it.startsWith("script.") }
         for (delete in toDelete)
             target.extra.properties.remove(delete)
 
         target.tasks {
+
+
+            /*
             named("checkKotlinGradlePluginConfigurationErrors") {
 //            named("extractPrecompiledScriptPluginPlugins") {
 
                 doFirst {
                     val plugins: Map<String, String> = target.file("build/catalog/plugins").readText()
-                            .split(',').associate {
-                                val (acc, id) = it.split('=')
-                                val accessor = if ('-' in acc) "`$acc`" else acc
-                                "    $accessor" to id
-                            }
+                        .split(',').associate {
+                            val (acc, id) = it.split('=')
+                            val accessor = if ('-' in acc) "`$acc`" else acc
+                            "    $accessor" to id
+                        }
                     //                    println(plugins)
                     for (script in scripts) {
                         val lines = script.readLines()
@@ -79,7 +167,7 @@ class PluginsCatalogPlugin : Plugin<Project> {
                             script.writeText(text)
                         }
                 }
-            }
+            }*/
         }
     }
 }

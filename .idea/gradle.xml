@@ -5,10 +5,12 @@
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="corretto-17" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/plugin" />
+            <option value="$PROJECT_DIR$/buildSrc-catalog" />
+            <option value="$PROJECT_DIR$/plugins-catalog" />
           </set>
         </option>
       </GradleProjectSettings>

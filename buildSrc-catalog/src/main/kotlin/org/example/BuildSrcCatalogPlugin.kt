@@ -10,9 +10,9 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.initialization.Settings
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.provider.Provider
-import org.gradle.internal.extensions.stdlib.capitalized
-import org.gradle.kotlin.dsl.create
+import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.kotlin.dsl.extra
+import org.gradle.plugin.devel.internal.precompiled.ExtractPluginRequestsTask
 import org.gradle.plugin.use.PluginDependency
 import java.io.File
 
@@ -49,6 +49,8 @@ class BuildSrcCatalogPlugin : Plugin<Settings> {
 //            })
 //            timestampFile.convention(buildSrc.dir("buildSrc-catalog"))
 //        }
+
+
 
         target.dependencyResolutionManagement {
             versionCatalogs {
@@ -127,7 +129,7 @@ class BuildSrcCatalogPlugin : Plugin<Settings> {
                 import org.gradle.api.artifacts.VersionCatalogsExtension
                 import org.gradle.api.provider.Provider
                 import org.gradle.kotlin.dsl.getByType
-                import org.gradle.kotlin.dsl.PluginDependenciesSpecScope
+                import org.gradle.kotlin.dsl.PluginDependenciesSpec
                 import org.gradle.plugin.use.PluginDependency
 
                 val Project.$libName
@@ -189,7 +191,7 @@ class BuildSrcCatalogPlugin : Plugin<Settings> {
             for (plugin in plugins.keys)
             // skip duplicates
             //                if (plugin !in extPlugins.keys)
-                +"val PluginDependenciesSpecScope.${plugin.maybeBackticks()} get() = Unit"
+                +"val PluginDependenciesSpec.${plugin.maybeBackticks()} get() = Unit"
         }
 
         // cache the results
